@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MediaHMI</string>
+    <string name="hello_world">Hello Music</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="stop">Stop</string>
+    <string name="skip">Skip</string>
+</resources>

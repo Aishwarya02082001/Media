@@ -1,0 +1,4 @@
+<resources>
+
+    <style name="Theme.MediaHMI" parent="Theme.AppCompat.DayNight.NoActionBar" />
+</resources>
