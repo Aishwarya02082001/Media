@@ -38,7 +38,7 @@ android {
                     "src\\main\\java",
                     "com\\example\\mediahmi\\service", "src\\main\\java", "src\\main\\java\\activity",
                     "src\\main\\java",
-                    "src\\main\\java\\service", "src\\main\\java", "service"
+                    "src\\main\\java\\service", "src\\main\\java", "service", "src\\main\\java", "src\\main\\java\\2"
                 )
             }
         }

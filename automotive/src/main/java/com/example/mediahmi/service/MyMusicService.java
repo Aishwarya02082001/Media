@@ -1,12 +1,17 @@
 package com.example.mediahmi.service;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat.MediaItem;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.media.MediaBrowserServiceCompat;
+
+import com.example.mediahmi.R;
+import com.example.mediahmi.manager.MusicPlayerManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +72,15 @@ public class MyMusicService extends MediaBrowserServiceCompat {
 
     private MediaSessionCompat mSession;
 
+    private final int[] musicResIds = {
+            R.raw.music1,
+            R.raw.music2,
+            R.raw.music3,
+            R.raw.music4,
+            R.raw.music5
+    };
+    private int mCurrentIndex = 0;
+    private static MusicPlayerManager mMusicPlayerManager;
 
     @Override
     public void onCreate() {
@@ -79,11 +93,38 @@ public class MyMusicService extends MediaBrowserServiceCompat {
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         Log.i("MyMusicService", "Session Token is set");
+
+        PlaybackStateCompat state = new PlaybackStateCompat.Builder().setActions(
+                PlaybackStateCompat.ACTION_PLAY |
+                        PlaybackStateCompat.ACTION_PAUSE |
+                        PlaybackStateCompat.ACTION_STOP |
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).setState(PlaybackStateCompat.STATE_NONE, 0, 0.1f)
+                        .build();
+
+        mSession.setPlaybackState(state);
+
+        mMusicPlayerManager = new MusicPlayerManager(this, musicResIds);
+        mMusicPlayerManager.setPlaybacakStateListener(this::updatePlaybackState);
+
+    }
+
+    private void updatePlaybackState(int state) {
+        PlaybackStateCompat playbackStateCompat = new PlaybackStateCompat.Builder().setActions(
+                        PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_STOP |
+                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).
+                setState(PlaybackStateCompat.STATE_NONE, 0, 0.1f)
+                .build();
+
+        mSession.setPlaybackState(playbackStateCompat);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mMusicPlayerManager.release();
         mSession.release();
     }
 
@@ -104,7 +145,7 @@ public class MyMusicService extends MediaBrowserServiceCompat {
         @Override
         public void onPlay() {
            Log.i("MyMusicService", "Music is playing");
-
+            mMusicPlayerManager.playCurrentSong();
         }
 
         @Override
@@ -123,20 +164,25 @@ public class MyMusicService extends MediaBrowserServiceCompat {
         @Override
         public void onPause() {
             Log.i("MyMusicService", "Music is paused");
+            mMusicPlayerManager.pauseCurrentSong();
         }
 
         @Override
         public void onStop() {
             Log.i("MyMusicService", "Music is stopped");
+            mMusicPlayerManager.stopCurrentSong();
         }
 
         @Override
         public void onSkipToNext() {
             Log.i("MyMusicService", "skip to next");
+            mMusicPlayerManager.skipToNext();
         }
 
         @Override
         public void onSkipToPrevious() {
+            Log.i("MyMusicService", "skip to previous");
+            mMusicPlayerManager.skipToPrevious();
         }
 
         @Override

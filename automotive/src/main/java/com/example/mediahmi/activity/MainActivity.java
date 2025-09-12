@@ -8,7 +8,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private Button mPlayBtn;
     private Button mPauseBtn;
     private Button mStopBtn;
-    private Button mSkipBtn;
+    private Button mPreviousBtn;
+    private Button mNextBtn;
 
     private MediaBrowserCompat mediaBrowserCompat;
     private MediaControllerCompat mediaController;
@@ -45,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
         mPlayBtn = (Button) findViewById(R.id.play);
         mPauseBtn = (Button) findViewById(R.id.pause);
         mStopBtn = (Button) findViewById(R.id.stop);
-        mSkipBtn = (Button) findViewById(R.id.skip);
+        mPreviousBtn = (Button) findViewById(R.id.previous);
+        mNextBtn = (Button) findViewById(R.id.next);
+
 
         mediaBrowserCompat = new MediaBrowserCompat(this,new ComponentName(this,MyMusicService.class),connectionCallback,null);
     }
@@ -96,7 +98,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        mSkipBtn.setOnClickListener(new View.OnClickListener() {
+        mPreviousBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mediaController != null) {
+                    mediaController.getTransportControls().skipToPrevious();
+                } else {
+                    Log.w("MediaApp", "MediaController is not connected yet.");
+                }
+            }
+        });
+
+        mNextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mediaController != null) {
@@ -118,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
         }
         mediaBrowserCompat.disconnect();
     }
-
-
 
     private final MediaBrowserCompat.ConnectionCallback connectionCallback = new MediaBrowserCompat.ConnectionCallback() {
 
