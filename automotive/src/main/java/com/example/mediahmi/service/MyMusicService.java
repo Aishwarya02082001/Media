@@ -95,12 +95,12 @@ public class MyMusicService extends MediaBrowserServiceCompat {
         Log.i("MyMusicService", "Session Token is set");
 
         PlaybackStateCompat state = new PlaybackStateCompat.Builder().setActions(
-                PlaybackStateCompat.ACTION_PLAY |
-                        PlaybackStateCompat.ACTION_PAUSE |
-                        PlaybackStateCompat.ACTION_STOP |
-                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
-                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).setState(PlaybackStateCompat.STATE_NONE, 0, 0.1f)
-                        .build();
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_STOP |
+                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS).setState(PlaybackStateCompat.STATE_NONE, 0, 0.1f)
+                .build();
 
         mSession.setPlaybackState(state);
 
@@ -144,8 +144,8 @@ public class MyMusicService extends MediaBrowserServiceCompat {
     private static final class MediaSessionCallback extends MediaSessionCompat.Callback {
         @Override
         public void onPlay() {
-           Log.i("MyMusicService", "Music is playing");
-            mMusicPlayerManager.playCurrentSong();
+            Log.i("MyMusicService", "Music is playing");
+            mMusicPlayerManager.togglePlayPause();
         }
 
         @Override

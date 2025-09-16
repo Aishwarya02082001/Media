@@ -25,16 +25,25 @@ public class MusicPlayerManager {
         this.playbackStateListener = listener;
     }
 
-    public void playCurrentSong() {
-
-        if (mMediaPlayer != null) {
-            mMediaPlayer.release();
+    public void togglePlayPause() {
+        if (mMediaPlayer == null) {
+            // Create & play first time
+            mMediaPlayer = MediaPlayer.create(context, musicResIds[currentIndex]);
+            mMediaPlayer.setOnCompletionListener(mp -> skipToNext());
+            mMediaPlayer.start();
+            notifyStateChanged(PlaybackStateCompat.STATE_PLAYING);
+            Log.d("MusicPlayerManager", "togglePlayPause(): created and playing");
+        } else {
+            if (mMediaPlayer.isPlaying()) {
+                mMediaPlayer.pause();
+                notifyStateChanged(PlaybackStateCompat.STATE_PAUSED);
+                Log.d("MusicPlayerManager", "togglePlayPause(): paused");
+            } else {
+                mMediaPlayer.start();
+                notifyStateChanged(PlaybackStateCompat.STATE_PLAYING);
+                Log.d("MusicPlayerManager", "togglePlayPause(): resumed");
+            }
         }
-        mMediaPlayer = MediaPlayer.create(context, musicResIds[currentIndex]);
-        mMediaPlayer.setOnCompletionListener(mp -> skipToNext());
-        mMediaPlayer.start();
-        notifyStateChanged(PlaybackStateCompat.STATE_PLAYING);
-        Log.i("MusicPlayerManager", "playCurrentSong is called");
     }
 
     public void pauseCurrentSong() {
@@ -57,7 +66,7 @@ public class MusicPlayerManager {
 
     public void skipToPrevious() {
         currentIndex = (currentIndex - 1 + musicResIds.length) % musicResIds.length;
-        playCurrentSong();
+        releaseAndPlaySong();
 
         Log.i("MusicPlayerManager", "skipToPrevious is called");
 
@@ -65,9 +74,20 @@ public class MusicPlayerManager {
 
     public void skipToNext() {
         currentIndex = (currentIndex + 1) % musicResIds.length;
-        playCurrentSong();
+        releaseAndPlaySong();
         Log.i("MusicPlayerManager", "skipToNext is called");
 
+    }
+
+    public void releaseAndPlaySong() {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+        mMediaPlayer = MediaPlayer.create(context, musicResIds[currentIndex]);
+        mMediaPlayer.setOnCompletionListener(mp -> skipToNext());
+        mMediaPlayer.start();
+        notifyStateChanged(PlaybackStateCompat.STATE_PLAYING);
     }
 
     public void release() {

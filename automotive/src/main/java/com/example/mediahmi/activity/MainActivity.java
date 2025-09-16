@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,8 +21,7 @@ import com.example.mediahmi.service.MyMusicService;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button mPlayBtn;
-    private Button mPauseBtn;
+    private Button mPlayPauseBtn;
     private Button mStopBtn;
     private Button mPreviousBtn;
     private Button mNextBtn;
@@ -35,53 +35,43 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        Log.i("MediaApp","MainActivity called in MediaApp");
+        Log.i("MediaApp", "MainActivity called in MediaApp");
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        mPlayBtn = (Button) findViewById(R.id.play);
-        mPauseBtn = (Button) findViewById(R.id.pause);
+        mPlayPauseBtn = (Button) findViewById(R.id.play_pause);
         mStopBtn = (Button) findViewById(R.id.stop);
         mPreviousBtn = (Button) findViewById(R.id.previous);
         mNextBtn = (Button) findViewById(R.id.next);
 
-
-        mediaBrowserCompat = new MediaBrowserCompat(this,new ComponentName(this,MyMusicService.class),connectionCallback,null);
+        mediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, MyMusicService.class), connectionCallback, null);
     }
 
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
         mediaBrowserCompat.connect();
     }
 
     public void setUpButtons() {
-        mPlayBtn.setOnClickListener(new View.OnClickListener() {
+        mPlayPauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (mediaController != null) {
-                    mediaController.getTransportControls().play();
-
-
-                } else {
-                    Log.w("MediaApp", "MediaController is not connected yet.");
+                if (mediaController == null) {
+                    return;
                 }
-
-            }
-        });
-
-        mPauseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mediaController != null) {
+                PlaybackStateCompat state = mediaController.getPlaybackState();
+                if (state != null && state.getState() == PlaybackStateCompat.STATE_PLAYING) {
+                    Log.w("MediaApp", "pause button clicked");
                     mediaController.getTransportControls().pause();
                 } else {
-                    Log.w("MediaApp", "MediaController is not connected yet.");
+                    Log.w("MediaApp", "play button clicked");
+                    mediaController.getTransportControls().play();
                 }
             }
         });
